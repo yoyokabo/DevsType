@@ -35,7 +35,7 @@ function App() {
 
   return (
     <div>
-          <button title='wewo' onClick={loadfile}/> <br/>
+          <button style={{ fontSize: '1.5em', padding: '10px' }} onClick={loadfile}>Load File</button> <br/>
           <text style={{ color: 'green' }}>{correct}
             <text style={{ color: 'red' }}>{content}</text>
           </text> 

@@ -111,7 +111,7 @@ function App() {
         let now = new Date()
         let seconds = (now.getTime() - StartTime.getTime() ) /1000
         setTimeTaken(seconds.toString())
-        setCpm((validchars/seconds).toString())
+        setCpm((validchars/seconds*60).toString())
 
       }
         

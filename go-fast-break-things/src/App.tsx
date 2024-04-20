@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import logo from './logo.svg';
 import './App.css';
 
 let capsLockOn = false;
@@ -37,6 +36,7 @@ function App() {
   const [code,setCode] = useState('')
   const [pointer,setPointer] = useState(0)
   
+  
 
   // Todo: work on presentation to make whitespaces more obvious
   const loadfile = (async () => {
@@ -46,8 +46,11 @@ function App() {
     
     }
     
-    setCode(await response.text())
-    setContent(code)
+    await response.text().then((code) => {
+      setContent(code)
+      setCode(code)
+    })
+    
     // for(let i:number=0; i<code.length; ++i){
     //   console.log(code.charCodeAt(i));
     // }
@@ -56,6 +59,7 @@ function App() {
   
 
   const handleChange = ((e: any) => {
+    
     console.log(e);
     // To get the key itself, access e.key
     // To get the key code, access e.keyCode
@@ -63,12 +67,11 @@ function App() {
     let keycode = e.nativeEvent?.keyCode;
     let key = e.nativeEvent?.key;
     let description = e.nativeEvent?.code;
-    console.log(key);
-    console.log(keycode);
     
     let inputCharacter;
-    if(keycode == "CapsLock")
-      capsLockOn = !capsLockOn;
+    if (e.getModifierState){ 
+      capsLockOn = (e.getModifierState("CapsLock"))  // Detects capslock
+    }
     shiftOn = e.nativeEvent.shiftKey;
     
     // Handle normal keys separately
@@ -87,29 +90,45 @@ function App() {
     if(validCharacters.has(key))
       inputCharacter = key;
 
-    console.log(inputCharacter);
+    
     //TODO: be more lenient with the whitespaces
     // Handle whitespaces
-    if(description == "Enter")
+    if(description === "Enter")
       inputCharacter = '\n';
-    if(description == "Space")
+    if(description === "Space")
       inputCharacter = ' ';
-    if(description == 'Tab')
+    if(description === 'Tab')
       inputCharacter = '\t';
 
-    if(inputCharacter == undefined){
+    console.log(inputCharacter);
+
+    if(inputCharacter === undefined){
       console.log('Unrecognized input character!');
       return;
     }
-
+    let isEnter = function (char: string) { return char.charCodeAt(0) === 10 || char.charCodeAt(0) === 13 };  // ehna falaheen
+    let newLine = isEnter(code[pointer]) && isEnter(inputCharacter)
+    
+    if (newLine) {
+      let newPointer = pointer;
+      while(!(validCharacters.has(code[newPointer]) || ('A'.charCodeAt(0) <= code[newPointer].toUpperCase().charCodeAt(0) && code[newPointer].toUpperCase().charCodeAt(0) <= 'Z'.charCodeAt(0)) )){
+        newPointer += 1
+        console.log(newPointer)
+      }
+      console.log(code[newPointer])
+      setPointer(newPointer)
+      setCorrect(code.slice(0,newPointer))
+      setContent(code.slice(newPointer))
+    }
     if (inputCharacter === code[pointer]){
       setPointer(pointer + 1)
       setCorrect(code.slice(0,pointer +1))
       setContent(code.slice(pointer+1))
       //last character is an EOF char probably
-      if(pointer == code.length - 1)
+      if(pointer === code.length - 1)
         alert("GG")
     }
+    
   })
     
   

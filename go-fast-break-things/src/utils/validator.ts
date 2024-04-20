@@ -58,7 +58,7 @@ const validator = {
     },
 
     isEnter(char: string) { 
-        return char.charCodeAt(0) === 10 || char.charCodeAt(0) === 13 
+        return (char.charCodeAt(0) === 10 || char.charCodeAt(0) === 13) 
     }
 
 }

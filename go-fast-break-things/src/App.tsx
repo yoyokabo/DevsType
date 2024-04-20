@@ -10,6 +10,8 @@ let validchars = 0;
 function App() {
   const [content,setContent] = useState('');
   const [correct,setCorrect] = useState('');
+  const [incorrect,setIncorrect] = useState(0);
+  const [wrong,setWrong] = useState('');    
   const [code,setCode] = useState('');
   const [pointer,setPointer] = useState(0);
   const [timeTaken,setTimeTaken] = useState<String>();
@@ -85,14 +87,23 @@ function App() {
     if(description === 'Tab')
       inputCharacter = '\t';
 
+    if(description === 'Backspace'){
+      if (incorrect > 0) {
+        setIncorrect(incorrect-1)
+        setWrong(wrong.slice(0,incorrect-1))
+      }
+      
+    }
+      
+
     console.log(inputCharacter);
 
     if(inputCharacter === undefined){
       console.log('Unrecognized input character!');
       return;
     }
-    
-    if (validator.isEnter(code[pointer])) {
+
+    if (validator.isEnter(inputCharacter)) {  // SUS
       let newPointer = pointer;
       while(!(validator.isValid(code[newPointer]))){
         newPointer += 1
@@ -101,11 +112,12 @@ function App() {
       setCorrect(code.slice(0,newPointer))
       setContent(code.slice(newPointer))
     }
-    if (inputCharacter === code[pointer]){
+    else if (incorrect === 0&&inputCharacter === code[pointer]){
       validchars = validchars + 1
       setPointer(pointer + 1)
       setCorrect(code.slice(0,pointer +1))
       setContent(code.slice(pointer+1))
+
       //last character is an EOF char probably
       if(pointer === code.length - 1){
         let now = new Date()
@@ -116,6 +128,10 @@ function App() {
       }
         
         
+    }
+    else {
+      setIncorrect(incorrect+1)
+      setWrong(wrong + key)
     }
     
   })
@@ -130,7 +146,9 @@ function App() {
     <div>
           <pre style={{color: 'green', backgroundBlendMode: "hue", backgroundColor: "ButtonShadow"}}>{correct}
           </pre> 
-            <pre style={{ color: 'red' }}>{content}
+            <pre style={{ color: 'blue' }}>{content}
+            </pre>
+            <pre style={{ color: 'red' }}>{wrong}
             </pre>
           <form onKeyDown={(e) => {
             handleChange(e)

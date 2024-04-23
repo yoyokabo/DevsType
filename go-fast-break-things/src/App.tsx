@@ -103,7 +103,7 @@ function App() {
       return;
     }
 
-    if (validator.isEnter(inputCharacter)) {  // SUS
+    if (validator.isEnter(inputCharacter) && validator.isEnter(code[pointer])) {  // SUS
       let newPointer = pointer;
       while(!(validator.isValid(code[newPointer]))){
         newPointer += 1

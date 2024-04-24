@@ -39,6 +39,10 @@ function App() {
   
 
   const handleChange = ((e: any) => {
+    // ignore all events running during IME composition
+    if (e.isComposing || e.keyCode === 229) {
+      return;
+    }
     if(pointer === 0){
       StartTime = new Date()
       validchars = 0
@@ -51,10 +55,18 @@ function App() {
     let key = e.nativeEvent?.key;
     let description = e.nativeEvent?.code;
     
-    // ignore all events running during IME composition
-    if (e.isComposing || e.keyCode === 229) {
-      return;
-    }
+
+    // declaring temp variables for the react states
+    // _t stands for temp as we will set the react states at the end of the function
+    let content_t = content;
+    let correct_t = correct;
+    let incorrect_t = incorrect;
+    let wrong_t = wrong;
+    let code_t = code;
+    let pointer_t = pointer;
+    let timeTaken_t = timeTaken;
+    let cpm_t = cpm;
+  
 
     let inputCharacter;
     if (e.getModifierState){ // Detects capslock
@@ -84,63 +96,70 @@ function App() {
     
     //TODO: be more lenient with the whitespaces
     // Handle whitespaces
-    if(description === "Enter")
-      inputCharacter = '\n';
-    if(description === "Space")
-      inputCharacter = ' ';
-    if(description === 'Tab')
-      inputCharacter = '\t';
-
-    if(description === 'Backspace'){
-      if (incorrect > 0) {
-        setIncorrect(incorrect-1)
-        setWrong(wrong.slice(0,incorrect-1))
-      }
-      return;
+    
+    switch (description){
+      case "Enter":
+        inputCharacter = '\n';
+        break;
+      case "Space":
+        inputCharacter = ' ';
+        break;
+      case "Tab":
+        inputCharacter = '\t';
+        break;
+      case "Backspace":
+        if (incorrect_t > 0) {
+          incorrect_t--;
+          wrong_t = wrong_t.slice(0,incorrect_t);
+        }  
+        break;
     }
-      
-
     console.log(inputCharacter);
 
     if(inputCharacter === undefined){
       console.log('Unrecognized input character!');
+      setIncorrect(incorrect_t);
+      setWrong(wrong_t);
       return;
     }
 
-    if (validator.isEnter(inputCharacter) && validator.isEnter(code[pointer])) {  // SUS
-      let newPointer = pointer;
-      while(!(validator.isValid(code[newPointer]))){
-        newPointer += 1
+    if (validator.isEnter(inputCharacter) && validator.isEnter(code_t[pointer_t])) {  // SUS
+      while(!(validator.isValid(code_t[pointer_t]))){
+        pointer_t += 1
       }
-      setPointer(newPointer)
-      setCorrect(code.slice(0,newPointer))
-      setContent(code.slice(newPointer))
+      correct_t = code_t.slice(0,pointer_t);
+      content_t = code_t.slice(pointer_t);
     }
-    else if (incorrect === 0 && inputCharacter === code[pointer]){
-      validchars = validchars + 1;
-      setPointer(pointer + 1)
-      setCorrect(code.slice(0,pointer +1))
-      setContent(code.slice(pointer+1))
+    else if (incorrect_t === 0 && inputCharacter === code_t[pointer_t]){
+      ++validchars;
+      ++pointer_t
+      correct_t = code_t.slice(0,pointer_t)
+      content_t = code_t.slice(pointer_t)
 
       //last character is an EOF char probably
-      if(pointer === code.length - 1){
+      if(pointer_t === code_t.length - 1){
         let now = new Date()
         let seconds = (now.getTime() - StartTime.getTime() ) /1000
-        setTimeTaken(seconds.toString())
-        setPointer(0);
-        setCorrect("");
-        setContent(code.slice(1));
-        setCpm((validchars/seconds*60).toString())
-
-      }
-        
-        
+        timeTaken_t = seconds.toString();
+        pointer_t = 0;
+        correct_t = "";
+        code_t = code_t.slice(1);
+        cpm_t = (validchars/seconds*60).toString();
+      }   
     }
     else {
-      setIncorrect(incorrect+1)
-      setWrong(wrong + key)
+      ++incorrect_t;
+      wrong_t += key;
     }
-    
+
+    setContent(content_t);
+    setCorrect(correct_t);
+    setIncorrect(incorrect_t);
+    setWrong(wrong_t);
+    setCode(code_t);
+    setPointer(pointer_t);
+    setTimeTaken(timeTaken_t);
+    setCpm(cpm_t);
   })
     
   useEffect(()=>{

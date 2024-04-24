@@ -10,7 +10,9 @@ let validchars = 0;
 function App() {
   const [content,setContent] = useState('');
   const [correct,setCorrect] = useState('');
+  // size of what you typed wrong
   const [incorrect,setIncorrect] = useState(0);
+  // string of what you typed wrong
   const [wrong,setWrong] = useState('');    
   const [code,setCode] = useState('');
   const [pointer,setPointer] = useState(0);
@@ -32,9 +34,6 @@ function App() {
       setCode(code)
     })
     
-    // for(let i:number=0; i<code.length; ++i){
-    //   console.log(code.charCodeAt(i));
-    // }
     setPointer(0)
   })
   
@@ -52,6 +51,11 @@ function App() {
     let key = e.nativeEvent?.key;
     let description = e.nativeEvent?.code;
     
+    // ignore all events running during IME composition
+    if (e.isComposing || e.keyCode === 229) {
+      return;
+    }
+
     let inputCharacter;
     if (e.getModifierState){ // Detects capslock
       capsLockOn = (e.getModifierState("CapsLock"))  
@@ -92,7 +96,7 @@ function App() {
         setIncorrect(incorrect-1)
         setWrong(wrong.slice(0,incorrect-1))
       }
-      
+      return;
     }
       
 
@@ -112,8 +116,8 @@ function App() {
       setCorrect(code.slice(0,newPointer))
       setContent(code.slice(newPointer))
     }
-    else if (incorrect === 0&&inputCharacter === code[pointer]){
-      validchars = validchars + 1
+    else if (incorrect === 0 && inputCharacter === code[pointer]){
+      validchars = validchars + 1;
       setPointer(pointer + 1)
       setCorrect(code.slice(0,pointer +1))
       setContent(code.slice(pointer+1))
@@ -123,6 +127,9 @@ function App() {
         let now = new Date()
         let seconds = (now.getTime() - StartTime.getTime() ) /1000
         setTimeTaken(seconds.toString())
+        setPointer(0);
+        setCorrect("");
+        setContent(code.slice(1));
         setCpm((validchars/seconds*60).toString())
 
       }

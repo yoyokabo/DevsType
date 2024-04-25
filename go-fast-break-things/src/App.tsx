@@ -182,18 +182,18 @@ function App() {
   
   return (
     <>
-    <div style={{display: 'flex',flexWrap: "wrap", }}>
-          <pre style={{color: 'green', backgroundBlendMode: "hue", backgroundColor: "ButtonShadow"}}>{correct}
+    <div style={{display: 'flex',flexWrap: "wrap" }}>
+          <pre style={{color: 'green'}}>{correct}
           </pre>
           <pre style={{ color: 'red' }}>{wrong}
             </pre>
-            <pre style={{ color: 'blue' }}>{content}
+            <pre style={{ color: 'white' }}>{content}
             </pre>
 
     </div>
-          <text>Your Time : {timeTaken}</text>
+          <text style={{ color: 'white' }}>Your Time : {timeTaken}</text>
           <br/>
-          <text>Your CPM : {cpm}</text>
+          <text style={{ color: 'white' }}>Your CPM : {cpm}</text>
           </>
   );
 }

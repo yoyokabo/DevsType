@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useRef , useEffect, useState } from 'react';
 import './App.css';
 import validator from './utils/validator';
 
@@ -19,7 +19,7 @@ function App() {
   const [timeTaken,setTimeTaken] = useState<String>();
   const [cpm,setCpm] = useState<String>();
   
-  
+  const winRef = useRef(window)
 
   // Todo: work on presentation to make whitespaces more obvious
   const loadfile = (async () => {
@@ -33,7 +33,6 @@ function App() {
       setContent(code)
       setCode(code)
     })
-    
     setPointer(0)
   })
   
@@ -51,9 +50,11 @@ function App() {
     // To get the key itself, access e.key
     // To get the key code, access e.keyCode
     // To get a description of they key, access e.code
-    let keycode = e.nativeEvent?.keyCode;
-    let key = e.nativeEvent?.key;
-    let description = e.nativeEvent?.code;
+    let keycode = e.keyCode;
+    let key = e.key;
+    console.log(key)
+
+    let description = e.code;
     
 
     // declaring temp variables for the react states
@@ -72,8 +73,9 @@ function App() {
     if (e.getModifierState){ // Detects capslock
       capsLockOn = (e.getModifierState("CapsLock"))  
     }
-    shiftOn = e.nativeEvent.shiftKey;
-    
+    shiftOn = e.shiftKey;
+    console.log(pointer)
+    console.log(code[pointer])
     // Handle normal keys separately
     // if(validator.isLetter(key)){
     //   inputCharacter = key
@@ -123,7 +125,7 @@ function App() {
       return;
     }
 
-    if (validator.isEnter(inputCharacter) && validator.isEnter(code_t[pointer_t])) {  // SUS
+    if (validator.isEnter(inputCharacter) && validator.isEnter(code_t[pointer_t]) && incorrect_t === 0) {  // SUS
       while(!(validator.isValid(code_t[pointer_t]))){
         pointer_t += 1
       }
@@ -137,13 +139,12 @@ function App() {
       content_t = code_t.slice(pointer_t)
 
       //last character is an EOF char probably
-      if(pointer_t === code_t.length - 1){
+      if(pointer_t === code_t.length){
         let now = new Date()
         let seconds = (now.getTime() - StartTime.getTime() ) /1000
         timeTaken_t = seconds.toString();
         pointer_t = 0;
-        correct_t = "";
-        code_t = code_t.slice(1);
+        correct_t = code
         cpm_t = (validchars/seconds*60).toString();
       }   
     }
@@ -164,28 +165,36 @@ function App() {
     
   useEffect(()=>{
     loadfile()
+
+
   },[])
+
+  // Adds event listener to whole window instead of textbox
+  useEffect(() => {
+    winRef.current.addEventListener('keydown', handleChange);
+
+    return () => {
+      winRef.current.removeEventListener('keydown', handleChange); // removed because it will keep adding new event listners everytime otherwise
+    };
+  })
 
   // Todo: Hide the words present in form, form should just be there for debugging purposes, not in actual UI
   
   return (
-    <div>
+    <>
+    <div style={{display: 'flex',flexWrap: "wrap", }}>
           <pre style={{color: 'green', backgroundBlendMode: "hue", backgroundColor: "ButtonShadow"}}>{correct}
-          </pre> 
+          </pre>
+          <pre style={{ color: 'red' }}>{wrong}
+            </pre>
             <pre style={{ color: 'blue' }}>{content}
             </pre>
-            <pre style={{ color: 'red' }}>{wrong}
-            </pre>
-          <form onKeyDown={(e) => {
-            handleChange(e)
-          }}>
-            <br></br>
-          <textarea />
-      </form>
-      <text>Your Time : {timeTaken}</text>
-      <br/>
-      <text>Your CPM : {cpm}</text>
+
     </div>
+          <text>Your Time : {timeTaken}</text>
+          <br/>
+          <text>Your CPM : {cpm}</text>
+          </>
   );
 }
 

@@ -183,15 +183,13 @@ function App() {
   
   return (
     <>
-    <div style={{display: 'flex',flexWrap: "wrap" }}>
-          <pre style={{color: 'green'}}>{correct}
-          </pre>
-          <pre style={{ color: 'red' }}>{wrong}
-            </pre>
+    <div style={{display: 'flex',flexWrap: "wrap" ,justifyContent:"flex-start"}}>
+          <pre>
+            <span style={{color: 'green'}}>{correct}</span>
+            <span style={{color: 'red'}}>{wrong}</span>
             <Blink text='_'></Blink>
-            <pre style={{ color: 'white' }}>{content}
-            </pre>
-
+            <span style={{color: 'white'}}>{content}</span>
+          </pre>
     </div>
           <text style={{ color: 'white' }}>Your Time : {timeTaken}</text>
           <br/>

@@ -6,7 +6,7 @@ interface BlinkProps {
 const Blink = ({text}: BlinkProps) => {
     return (
         <>
-        <pre className={`${styles.blink_me}`}>{text}</pre>
+        <span className={`${styles.blink_me}`}>{text}</span>
     </>
     )
 }

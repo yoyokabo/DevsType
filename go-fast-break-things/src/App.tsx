@@ -23,8 +23,8 @@ function App() {
   const winRef = useRef(window)
 
   // Todo: work on presentation to make whitespaces more obvious
-  const loadfile = (async () => {
-    const response = await fetch(`${process.env.PUBLIC_URL}/binarysearch.txt`)
+  const loadfile = (async (type = "python") => {
+    const response = await fetch(`${process.env.PUBLIC_URL}/${type}.txt`)
     if (!response.ok) {
       throw new Error('Failed to fetch file');
     
@@ -35,10 +35,17 @@ function App() {
       setCode(code)
     })
     setPointer(0)
+    setCorrect('')
+    setIncorrect(0)
+    setWrong('')
   })
   
+  const something = ((e: any) => { 
+    loadfile(e.target.value)
+  })
 
   const handleChange = ((e: any) => {
+    e.preventDefault()  // Prevents space from scrolling
     // ignore all events running during IME composition
     if (e.isComposing || e.keyCode === 229) {
       return;
@@ -183,18 +190,27 @@ function App() {
   
   return (
     <>
-    <div style={{display: 'flex',flexWrap: "wrap" ,justifyContent:"flex-start"}}>
+    <div style={{display: 'block',flexWrap: "wrap" ,justifyContent:"flex-start"}}>
+    <label >Choose a Language:</label>
+    <select id="language" onChange={something} name="language">
+      <option value="python">Python</option>
+      <option value="c++">C++</option>
+      <option value="javascript">JavaScript</option>
+    </select>
           <pre>
             <span style={{color: 'green'}}>{correct}</span>
             <span style={{color: 'red'}}>{wrong}</span>
             <Blink text='_'></Blink>
             <span style={{color: 'white'}}>{content}</span>
           </pre>
-    </div>
           <text style={{ color: 'white' }}>Your Time : {timeTaken}</text>
           <br/>
           <text style={{ color: 'white' }}>Your CPM : {cpm}</text>
-          </>
+    </div>
+    
+    
+          
+  </>
   );
 }
 

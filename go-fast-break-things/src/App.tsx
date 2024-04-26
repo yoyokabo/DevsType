@@ -1,6 +1,7 @@
 import { useRef , useEffect, useState } from 'react';
 import './App.css';
 import validator from './utils/validator';
+import Blink from './components/blink';
 
 let capsLockOn = false;
 let shiftOn = false;
@@ -187,6 +188,7 @@ function App() {
           </pre>
           <pre style={{ color: 'red' }}>{wrong}
             </pre>
+            <Blink text='_'></Blink>
             <pre style={{ color: 'white' }}>{content}
             </pre>
 

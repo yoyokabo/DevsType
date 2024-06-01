@@ -9,6 +9,8 @@ let StartTime: Date
 let validchars = 0;
 
 function App() {
+  // Added Master to store code for reset.
+  const [master,setMaster] = useState('');
   const [content,setContent] = useState('');
   const [correct,setCorrect] = useState('');
   // size of what you typed wrong
@@ -31,6 +33,7 @@ function App() {
     }
     
     await response.text().then((code) => {
+      setMaster(code)
       setContent(code)
       setCode(code)
     })
@@ -42,6 +45,15 @@ function App() {
   
   const something = ((e: any) => { 
     loadfile(e.target.value)
+  })
+
+  const restart = ((e:any) => {
+    setPointer(0)
+    setCorrect('')
+    setIncorrect(0)
+    setWrong('')
+    setContent(master)
+    setCode(master)
   })
 
   const handleChange = ((e: any) => {
@@ -182,6 +194,7 @@ function App() {
     winRef.current.addEventListener('keydown', handleChange);
 
     return () => {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       winRef.current.removeEventListener('keydown', handleChange); // removed because it will keep adding new event listners everytime otherwise
     };
   })
@@ -191,21 +204,29 @@ function App() {
   return (
     <>
     <div style={{display: 'block',flexWrap: "wrap" ,justifyContent:"flex-start"}}>
-    <label >Choose a Language:</label>
-    <select id="language" onChange={something} name="language">
+    <label style={{fontSize:"40px"}} >Choose a Language:</label>
+    <select style={{fontSize:"40px"}}id="language" onChange={something} name="language">
       <option value="python">Python</option>
       <option value="c++">C++</option>
       <option value="javascript">JavaScript</option>
     </select>
-          <pre>
-            <span style={{color: 'green'}}>{correct}</span>
+    
+    <div style={{backgroundColor:"rgb(45,45,52)", width:"70%", marginLeft:"15%",marginTop:"5%",borderStyle:"solid",borderBlockWidth:"10px",borderBlockColor:"black"}}>
+      
+          <pre style={{fontSize:"36px", textAlign:"left"}}>
+            <span style={{color: 'White'}}>{correct}</span>
             <span style={{color: 'red'}}>{wrong}</span>
             <Blink text='_'></Blink>
-            <span style={{color: 'white'}}>{content}</span>
+            <span style={{color: 'Grey'}}>{content}</span>
           </pre>
+          
+          </div>
+          <button style={{display:"inline" , left:"100%",marginLeft:"81.1%",fontSize:"24px"}}  onClick={restart}>Restart</button>
+          <div style={{textAlign:"center",fontSize:"40px"}}>
           <text style={{ color: 'white' }}>Your Time : {timeTaken}</text>
           <br/>
           <text style={{ color: 'white' }}>Your CPM : {cpm}</text>
+          </div>
     </div>
     
     

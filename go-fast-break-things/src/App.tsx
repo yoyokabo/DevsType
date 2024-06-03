@@ -7,9 +7,13 @@ let capsLockOn = false;
 let shiftOn = false;
 let StartTime: Date
 let validchars = 0;
+let shadowtime: Date
 
 function App() {
+  // Finished Flag
+  let finished = false;
   // Added Master to store code for reset.
+  const [shadow, setShadow] = useState('PlaceHolder');
   const [master,setMaster] = useState('');
   const [content,setContent] = useState('');
   const [correct,setCorrect] = useState('');
@@ -20,7 +24,7 @@ function App() {
   const [code,setCode] = useState('');
   const [pointer,setPointer] = useState(0);
   const [timeTaken,setTimeTaken] = useState<String>();
-  const [cpm,setCpm] = useState<String>();
+  const [cpm,setCpm] = useState<string>();
   
   const winRef = useRef(window)
 
@@ -56,6 +60,25 @@ function App() {
     setCode(master)
   })
 
+  const startShadow = (async (cpm:string) => {
+    const chars = parseFloat(cpm)
+    const rate = chars / 60
+    shadowtime = new Date()
+    renderShadow(rate)
+  })
+  const renderShadow = ((rate:number) => {
+    shadowtime = new Date()
+    let seconds = (shadowtime.getTime() - StartTime.getTime() ) /1000
+    let total = Math.floor(seconds * rate)
+    setShadow(master.slice(total,total + 10))
+    
+    setTimeout(renderShadow, 100,rate);
+    
+
+  }) 
+
+  
+
   const handleChange = ((e: any) => {
     e.preventDefault()  // Prevents space from scrolling
     // ignore all events running during IME composition
@@ -65,6 +88,10 @@ function App() {
     if(pointer === 0){
       StartTime = new Date()
       validchars = 0
+      if (cpm != null){
+        startShadow(cpm)
+      }
+
     }
     console.log(e);
     // To get the key itself, access e.key
@@ -166,6 +193,7 @@ function App() {
         pointer_t = 0;
         correct_t = code
         cpm_t = (validchars/seconds*60).toString();
+        finished = true;
       }   
     }
     else {
@@ -223,7 +251,12 @@ function App() {
           </div>
           <button style={{display:"inline" , left:"100%",marginLeft:"81.1%",fontSize:"24px"}}  onClick={restart}>Restart</button>
           <div style={{textAlign:"center",fontSize:"40px"}}>
+          
+          <text style={{ color: 'white' }}>Your Shadow: {shadow}</text>
+          <br/>
           <text style={{ color: 'white' }}>Your Time : {timeTaken}</text>
+          
+          
           <br/>
           <text style={{ color: 'white' }}>Your CPM : {cpm}</text>
           </div>
